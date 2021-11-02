@@ -61,11 +61,15 @@ export default {
       bPOLaddressesPart2: [],
       bPOLaddressesPart3: [],
       bPOLaddressesPart4: [],
+      bPOLaddressesPart5: [],
+      bPOLaddressesPart6: [],
       bPOLaddress: [],
       bPOLaddressPart1: [],
       bPOLaddressPart2: [],
       bPOLaddressPart3: [],
       bPOLaddressPart4: [],
+      bPOLaddressPart5: [],
+      bPOLaddressPart6: [],
       sortBPol: new Map(),
       sortBPolPart1: new Map(),
       sortBPolPart2: new Map(),
@@ -129,11 +133,15 @@ export default {
       this.bPOLaddressesPart1 = this.bPOLaddresses.slice(0,1500).join('","')
       this.bPOLaddressesPart2 = this.bPOLaddresses.slice(1500,3000).join('","')
       this.bPOLaddressesPart3 = this.bPOLaddresses.slice(3000, 4500).join('","')
-      this.bPOLaddressesPart4 = this.bPOLaddresses.slice(4500).join('","')
-      console.log(this.bPOLaddressesPart3)
+      this.bPOLaddressesPart4 = this.bPOLaddresses.slice(4500, 6000).join('","')
+      this.bPOLaddressesPart5 = this.bPOLaddresses.slice(6000, 7500).join('","')
+      this.bPOLaddressesPart6 = this.bPOLaddresses.slice(7500).join('","')
       await this.takeBPOLPart1()
       await this.takeBPOLPart2()
       await this.takeBPOLPart3()
+      await this.takeBPOLPart4()
+      await this.takeBPOLPart5()
+      await this.takeBPOLPart6()
       for (const [key, value] of this.sortBPolPart1.entries()) {
         this.sortBPol.set(key,value)
       }
@@ -141,6 +149,15 @@ export default {
         this.sortBPol.set(key,value)
       }
       for (const [key, value] of this.sortBPolPart3.entries()) {
+        this.sortBPol.set(key,value)
+      }
+       for (const [key, value] of this.sortBPolPart4.entries()) {
+        this.sortBPol.set(key,value)
+      }
+       for (const [key, value] of this.sortBPolPart5.entries()) {
+        this.sortBPol.set(key,value)
+      }
+       for (const [key, value] of this.sortBPolPart6.entries()) {
         this.sortBPol.set(key,value)
       }
       this.sortBPol = new Map([...this.sortBPol.entries()].sort((a, b) => b[1] - a[1]));
@@ -297,7 +314,7 @@ export default {
     async takeBPOLPart4(){
       
       const query = `
- query ($address: [String!] = ["${this.bPOLaddressesPart3}"]) {
+ query ($address: [String!] = ["${this.bPOLaddressesPart4}"]) {
   ethereum(network: bsc) {
     address(address: {in: $address}) {
       balances(currency: {in: ["0x8a9c889E60eE674f0D55075fA0D60FB05E1a7aEe"]}) {
@@ -324,7 +341,6 @@ export default {
       
       await fetch(this.url, optss)
           .then((response) => {
-            console.log(1111)
             return response.json();
             
           })
@@ -342,6 +358,104 @@ export default {
             let addre = []
             addre.push(this.sortBPolPart4.keys())
             this.bPOLaddressPart4 = addre[0]
+          });
+    },
+     async takeBPOLPart5(){
+      
+      const query = `
+ query ($address: [String!] = ["${this.bPOLaddressesPart5}"]) {
+  ethereum(network: bsc) {
+    address(address: {in: $address}) {
+      balances(currency: {in: ["0x8a9c889E60eE674f0D55075fA0D60FB05E1a7aEe"]}) {
+        currency {
+          symbol
+        }
+        value
+      }
+      address
+    }
+  }
+}
+    `;
+      const optss = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-API-KEY": "BQYKrkmtyqXiAXk4Qm2YfyvwQpc2rAQp"
+        },
+        body: JSON.stringify({
+          query
+        })
+      };
+      
+      await fetch(this.url, optss)
+          .then((response) => {
+            return response.json();
+            
+          })
+          .then((arr) => {
+            console.log(arr)
+            let bPol = new Map()
+            for (let i = 0; i < arr.data.ethereum.address.length; i++) {
+              if (arr.data.ethereum.address[i].balances !== null && arr.data.ethereum.address[i].balances[0] !== undefined && arr.data.ethereum.address !== 0) {
+                if (arr.data.ethereum.address[i].balances[0].value > 0) {
+                  bPol.set(arr.data.ethereum.address[i].address, arr.data.ethereum.address[i].balances[0].value)
+                }
+              }
+            }
+            this.sortBPolPart5 = new Map([...bPol.entries()].sort((a, b) => b[1] - a[1]));
+            let addre = []
+            addre.push(this.sortBPolPart5.keys())
+            this.bPOLaddressPart5 = addre[0]
+          });
+    },
+     async takeBPOLPart6(){
+      
+      const query = `
+ query ($address: [String!] = ["${this.bPOLaddressesPart6}"]) {
+  ethereum(network: bsc) {
+    address(address: {in: $address}) {
+      balances(currency: {in: ["0x8a9c889E60eE674f0D55075fA0D60FB05E1a7aEe"]}) {
+        currency {
+          symbol
+        }
+        value
+      }
+      address
+    }
+  }
+}
+    `;
+      const optss = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-API-KEY": "BQYKrkmtyqXiAXk4Qm2YfyvwQpc2rAQp"
+        },
+        body: JSON.stringify({
+          query
+        })
+      };
+      
+      await fetch(this.url, optss)
+          .then((response) => {
+            return response.json();
+            
+          })
+          .then((arr) => {
+            console.log(arr)
+            let bPol = new Map()
+            for (let i = 0; i < arr.data.ethereum.address.length; i++) {
+              if (arr.data.ethereum.address[i].balances[0] !== undefined && arr.data.ethereum.address !== 0) {
+                if (arr.data.ethereum.address[i].balances[0].value > 0) {
+                  bPol.set(arr.data.ethereum.address[i].address, arr.data.ethereum.address[i].balances[0].value)
+                }
+              }
+            }
+            this.sortBPolPart6 = new Map([...bPol.entries()].sort((a, b) => b[1] - a[1]));
+            let addre = []
+            addre.push(this.sortBPolPart6.keys())
+            this.bPOLaddressPart6 = addre[0]
           });
     }
 
